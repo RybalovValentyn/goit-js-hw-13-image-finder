@@ -75,14 +75,14 @@ function clearImagesList() {
   imagesRef.innerHTML = '';
 }
 
-window.addEventListener('scroll',  debounce((scrollImages),500));
+window.addEventListener('scroll',  debounce((scrollImages),200));
 
 async function scrollImages() {
   try {
     let windowRelativeBottom = document.documentElement.getBoundingClientRect().bottom;
 
      // если пользователь прокрутил достаточно далеко (< 100px до конца)
-      if (windowRelativeBottom < document.documentElement.clientHeight + 200) {
+      if (windowRelativeBottom < document.documentElement.clientHeight + 400) {
        
         // добавим больше данных
         console.log('log');
