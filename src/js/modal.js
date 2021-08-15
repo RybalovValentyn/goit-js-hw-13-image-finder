@@ -9,6 +9,7 @@ let id = 0;
 
 modalBtnClouse.addEventListener('click', clousedModalWindow);
 window.addEventListener('keydown', onEscKeyPress);
+overlay.addEventListener('click', clickOnBackdrop);
 
 async function onImagesClick(evt) {   
 try {
@@ -35,6 +36,12 @@ try {
     console.log(error.stack);
    }
  };
+
+function clickOnBackdrop(evt) {
+    if (evt.currentTarget === evt.target) {
+    clousedModalWindow()
+  }
+}
 
 function clousedModalWindow() {
   modalImg.src = '';
