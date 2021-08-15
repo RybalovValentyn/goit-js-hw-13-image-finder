@@ -2,15 +2,12 @@ import './sass/main.scss';
 const body = document.querySelector('body');
 import API from './js/apiService';
 import imagesCardHbs from './templates/imagesCard.hbs';
+import MODAL  from './js/modal';
+
 const debounce = require('lodash.debounce');
-console.log(body);
-
-
-
-let images = [];
-
-body.innerHTML =
-` <form class="search-form" id="search-form">
+let image = [];
+let pageNum = 1;
+const insertElement = `<form class="search-form" id="search-form">
 <input
   type="text"
   name="query"
@@ -19,53 +16,47 @@ body.innerHTML =
 />
 </form>
 <ul class="gallery"></ul>`
+body.insertAdjacentHTML('afterbegin', insertElement)
+
 
 const searchForm = document.querySelector('.search-form')
 const inputContent = document.querySelector('.search-form input')
-
 const imagesRef = document.querySelector('.gallery');
 
 searchForm.addEventListener('input', debounce((onSearch),500));
 
-
-
-// Detect when scrolled to bottom.
-
-
-function loadMore() {
-  
-  console.log('log');
-  API.fetchImages(image)
+async function loadMore() {
+  try {
+    pageNum += 1;
+  console.log('pageNum',pageNum);
+  console.log('log in load more');
+ await API.fetchImages(image, pageNum)
   .then(images => {renderImagesCard(images)})
-  
-   
-} ;
+  } catch (error) {
+    console.log(error.stack); 
+  }
+  } ;
 
-
-
-function onSearch(e) {
-  // 
-// e.preventDefault();
-console.log(inputContent);
- let image = ''; 
-   
+async function onSearch(e) {
+  try {
+    let image = '';   
 image = e.target.value;
-
-if (image != ' '){
-  console.dir('sdvsdfbgdsfb', image);
-  API.fetchImages(image)
-  .then(images => {renderImagesCard(images)})
-    .catch(onFetchError);
+if (image != ' ' || '' || '  '){
+  clearImagesList();
+ await API.fetchImages(image)
+  .then(images => {renderImagesCard(images)}).catch(onFetchError);
+  return 
    }
-}
-
+   } catch (error) {
+    console.log(error.stack);
+  }
+};
 
 function renderImagesCard(images) {
- 
-  if (images.hits.length > 0) {
-    clearImagesList();
-     console.log('render',images.hits.length);
-    imagesRef.insertAdjacentHTML('afterbegin', imagesCardHbs(images.hits));
+   if (images.hits.length > 0) {
+       console.log('render',images);
+    imagesRef.insertAdjacentHTML('beforeend', imagesCardHbs(images.hits));
+    document.addEventListener('DOMContentLoaded',onImageModalServis());
       }
 else 
 {inputContent.value = 'Введите другой запрос';
@@ -77,9 +68,43 @@ function inputClearValue() {
 }
 
 function onFetchError() {
-  console.log('error');
+  console.log('error in fetch');
 };
 
 function clearImagesList() {
   imagesRef.innerHTML = '';
 }
+
+window.addEventListener('scroll',  debounce((scrollImages),500));
+
+async function scrollImages() {
+  try {
+    let windowRelativeBottom = document.documentElement.getBoundingClientRect().bottom;
+
+     // если пользователь прокрутил достаточно далеко (< 100px до конца)
+      if (windowRelativeBottom < document.documentElement.clientHeight + 200) {
+       
+        // добавим больше данных
+        console.log('log');
+       await loadMore(image, pageNum);
+     
+    }
+  }
+  catch (error) {
+    console.log(error);
+  }
+};
+
+async function onImageModalServis() {
+   try {
+   const imageContainer = document.querySelector('.gallery');
+ 
+    imageContainer.addEventListener('click',MODAL.onImagesClick);
+     }
+  catch (error){
+    console.log(error.stack);
+    
+  }
+}
+
+
