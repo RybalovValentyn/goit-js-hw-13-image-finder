@@ -5,7 +5,7 @@ import imagesCardHbs from './templates/imagesCard.hbs';
 import MODAL  from './js/modal';
 
 const debounce = require('lodash.debounce');
-let image = [];
+let image = " ";
 let pageNum = 1;
 const insertElement = `<form class="search-form" id="search-form">
 <input
@@ -14,6 +14,7 @@ const insertElement = `<form class="search-form" id="search-form">
   autocomplete="off"
   placeholder="Search images..."
 />
+<button type="submit">submit</button>
 </form>
 <ul class="gallery"></ul>`
 body.insertAdjacentHTML('afterbegin', insertElement)
@@ -23,7 +24,7 @@ const searchForm = document.querySelector('.search-form')
 const inputContent = document.querySelector('.search-form input')
 const imagesRef = document.querySelector('.gallery');
 
-searchForm.addEventListener('input', debounce((onSearch),500));
+searchForm.addEventListener('submit', onSearch);
 
 async function loadMore() {
   try {
@@ -38,9 +39,11 @@ async function loadMore() {
   } ;
 
 async function onSearch(e) {
+  e.preventDefault();
   try {
     let image = '';   
-image = e.target.value;
+image = inputContent.value;
+console.log(image);
 if (image != ' ' || '' || '  '){
   clearImagesList();
  await API.fetchImages(image)

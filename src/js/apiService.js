@@ -1,5 +1,5 @@
 
-let perPage = 22;
+let perPage = 12;
 
 
 function fetchImages(image, pageNum ) {
